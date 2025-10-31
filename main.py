@@ -7,7 +7,7 @@ from settings import *
 from sprites import *
 from os import path
 from utils import *
-
+#banana
 class Game:
     def __init__(self):
         pg.init()
