@@ -217,6 +217,7 @@ class Wall(Sprite):
         self.rect.x = self.pos.x
         self.rect.y = self.pos.y
 
+#Ball Sprite
 class Ball(Sprite):
     def __init__(self, game, x, y):
         self.groups = game.all_sprites
@@ -243,10 +244,9 @@ class Ball(Sprite):
             #hits is colliding with walls
             hits = pg.sprite.spritecollide(self, self.game.all_walls, False)
             if hits:
-                #if self.pos.x < 32.5
-
-
+                #If it touches the coordinates that are the edges of the screen
                 if  hits[0].rect.left == 0:
+                    #Switches direction and adds a little speed to not be stuck on the wall
                     self.vel.x = self.vel.x * -1.02
                 elif hits[0].rect.right == 1024:
                     self.vel.x = self.vel.x *-1.02
@@ -266,6 +266,7 @@ class Ball(Sprite):
             #hits is colliding with walls
             hits = pg.sprite.spritecollide(self, self.game.all_walls, False)
             if hits:
+                #Same as the x 
                 if  hits[0].rect.top == 0:
                     self.vel.y = self.vel.y * -1.02
                 elif hits[0].rect.bottom == 768:
@@ -287,16 +288,20 @@ class Ball(Sprite):
         hits = pg.sprite.spritecollide(self, group, kill)
         self.initBallSpeed = 10
         if hits: 
-            # hitting a mob
+            # hitting the player
             if str(hits[0].__class__.__name__) == "Player":
+                #If the player and the ball are facing the same direction
                 if self.vel.x * self.game.player.vel.x > 0:
+                    #Moves in the opposite direction
                     self.vel.x = self.vel.x * -1
                 else:
+                    #If the player hits the ball
                     if self.game.player.vel.x > 0:
+                        #Increase speed based on the player
                         self.vel.x = self.game.player.vel.x + self.initBallSpeed
                     elif self.game.player.vel.x < 0:
                         self.vel.x = self.game.player.vel.x - self.initBallSpeed
-                    else:
+                    else: #If player isn't moving
                         self.vel.x = self.vel.x * -1
                 # print("Player")
                 # print(self.game.player.vel.x)
@@ -305,7 +310,7 @@ class Ball(Sprite):
                 # print(self.vel.x)
                 # print(self.vel.y)
 
-
+                #Same as x
                 if self.vel.y * self.game.player.vel.y > 0:
                     self.vel.y = self.vel.y * -1
                 else:
@@ -317,13 +322,15 @@ class Ball(Sprite):
                         self.vel.y = self.vel.y * -1
                 
 
-            # hitting a coin
+            # hitting a mob
             if str(hits[0].__class__.__name__) == "Mob":
                 pass
 
     def update(self):
+        #Moving based on the velocity
         self.pos.x += self.vel.x
         self.pos.y += self.vel.y
+        #Collision with stuff
         self.rect.x = self.pos.x
         self.collide_with_walls('x')
         self.rect.y = self.pos.y
@@ -333,15 +340,17 @@ class Ball(Sprite):
         self.collide_with_stuff(self.game.all_players, False)
 
         self.slowdownRate = 0.2
+        #Value close to 0 because it is hard for the ball to be percisely 0
         self.zero = 0.25
+        #Slows down over time
         if self.vel.x > self.zero:
             self.vel.x -= self.slowdownRate
         elif self.vel.x < self.zero:
             self.vel.x += self.slowdownRate
-
+        #If it is very close to 0, make it 0
         if abs(self.vel.x) <= self.zero:
             self.vel.x = 0
-
+        #Same as x
         if self.vel.y > self.zero:
             self.vel.y -= self.slowdownRate
         elif self.vel.y < self.zero:

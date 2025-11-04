@@ -5,7 +5,7 @@ import sys
 import pygame as pg
 from settings import *
 from sprites import *
-from os import path
+from os import path 
 from utils import *
 #banana
 class Game:
