@@ -90,9 +90,10 @@ class Player(Sprite):
                 if self.cd.ready():
                     self.health -= 10
                     self.cd.start()
-            # hitting a coin
-            if str(hits[0].__class__.__name__) == "Coin":
-                self.coins += 1
+            # hitting the goal
+            if str(hits[0].__class__.__name__) == "Goal":
+                pass
+            
             if str(hits[0].__class__.__name__) == "Ball":
                 pass
 
@@ -165,11 +166,11 @@ class Mob(Sprite):
     
     def update(self):
         # mob behavior
-        if self.game.player.pos.x > self.pos.x:
+        if self.game.ball.pos.x > self.pos.x:
             self.vel.x = 1
         else:
             self.vel.x = -1
-        if self.game.player.pos.y > self.pos.y:
+        if self.game.ball.pos.y > self.pos.y:
             self.vel.y = 1
         else:
             self.vel.y = -1
@@ -232,7 +233,7 @@ class Ball(Sprite):
         self.pos = vec(x,y) * TILESIZE[0]
         self.speed = 250
         self.health = 100
-        self.coins = 0
+        self.count = 0
         self.cd = Cooldown(1000)
 
 
@@ -322,9 +323,11 @@ class Ball(Sprite):
                         self.vel.y = self.vel.y * -1
                 
 
-            # hitting a mob
-            if str(hits[0].__class__.__name__) == "Mob":
-                pass
+            # hitting the goal
+            if str(hits[0].__class__.__name__) == "Goal":
+                self.count += 1
+                self.kill()
+                
 
     def update(self):
         #Moving based on the velocity
@@ -338,6 +341,8 @@ class Ball(Sprite):
 
         self.collide_with_stuff(self.game.all_mobs, False)
         self.collide_with_stuff(self.game.all_players, False)
+        self.collide_with_stuff(self.game.all_goals, False)
+
 
         self.slowdownRate = 0.2
         #Value close to 0 because it is hard for the ball to be percisely 0
@@ -364,4 +369,23 @@ class Ball(Sprite):
             # print("c-X:" + str(self.collideX))
             # print("c-y:" + str(self.collideY))
 
-   
+#Goal Sprite
+#Basically the same as wall
+class Goal(Sprite):
+    def __init__(self, game, x, y, state):
+        self.groups = game.all_sprites, game.all_goals
+        Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface(TILESIZE)
+        self.image.fill(GREEN)
+        self.rect = self.image.get_rect()
+        self.vel = vec(0,0)
+        self.pos = vec(x,y) * TILESIZE[0]
+        self.state = state
+        # print("wall created at", str(self.rect.x), str(self.rect.y))
+    def update(self):
+        # goal
+        self.pos += self.vel
+        self.rect.x = self.pos.x
+        self.rect.y = self.pos.y
+

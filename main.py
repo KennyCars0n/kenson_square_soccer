@@ -33,6 +33,8 @@ class Game:
         self.all_walls = pg.sprite.Group()
         self.all_players = pg.sprite.Group()
         self.all_balls = pg.sprite.Group()
+        self.all_goals = pg.sprite.Group()
+
         for row, tiles, in enumerate(self.map.data):
             for col, tile, in enumerate(tiles):
                 if tile == '1':
@@ -49,6 +51,9 @@ class Game:
                     Mob(self, col, row)
                 elif tile == 'B':
                     self.ball = Ball(self, col, row)
+                    #Creating a goal on every tile 'G'
+                elif tile == 'G':
+                    Goal(self, col, row, "")
                                     
                     
     def run(self):
@@ -88,7 +93,7 @@ class Game:
         #Displaying health on the screen 
         self.draw_text(self.screen, str(self.player.health), 24, BLACK, 100, 100)
         #Displaying score on the screen
-        self.draw_text(self.screen, str(self.player.coins), 24, BLACK, 400, 100)
+        self.draw_text(self.screen, str(self.ball.count), 24, BLACK, 400, 100)
         self.draw_text(self.screen, str(self.time), 24, BLACK, 700, 100 )
         #Adding all of the sprites
         self.all_sprites.draw(self.screen)
