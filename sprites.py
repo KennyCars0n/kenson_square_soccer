@@ -166,6 +166,7 @@ class Mob(Sprite):
     
     def update(self):
         # mob behavior
+        # chasing the ball
         if self.game.ball.pos.x > self.pos.x:
             self.vel.x = 1
         else:
@@ -227,8 +228,8 @@ class Ball(Sprite):
         self.image = pg.Surface((32, 32))
         self.image.fill(BLACK)
         self.rect = self.image.get_rect()
-        # self.rect.x = x * TILESIZE[0]
-        # self.rect.y = y * TILESIZE[1]
+        self.rect.x = x * TILESIZE[0]
+        self.rect.y = y * TILESIZE[1]
         self.vel = vec(0,0)
         self.pos = vec(x,y) * TILESIZE[0]
         self.speed = 250
@@ -239,12 +240,26 @@ class Ball(Sprite):
 
 
 
+
     def collide_with_walls(self, dir):
-        # x axis
+        #colliding with walls
+        '''
         if dir == 'x':
-            #hits is colliding with walls
             hits = pg.sprite.spritecollide(self, self.game.all_walls, False)
             if hits:
+                self.vel.x *= -1.02
+        if dir == 'y':
+            hits = pg.sprite.spritecollide(self, self.game.all_walls, False)
+            if hits:
+                self.vel.y *= -1.02
+        print("x:" + str(self.pos.x))
+        print("y:" + str(self.pos.y))
+        '''
+        if self.rect.left <= 0 or self.rect.right >= WIDTH:
+            self.vel.x = -self.vel.x
+        if self.rect.top <= 0 or self.rect.bottom >= HEIGHT:
+            self.vel.y = -self.vel.y
+        '''
                 #If it touches the coordinates that are the edges of the screen
                 if  hits[0].rect.left == 0:
                     #Switches direction and adds a little speed to not be stuck on the wall
@@ -284,6 +299,7 @@ class Ball(Sprite):
                 #     self.pos.y = hits[0].rect.bottom
                 # # hits[0].vel.y = 0
                 # self.rect.y = self.pos.y
+        '''
 
     def collide_with_stuff(self, group, kill):
         hits = pg.sprite.spritecollide(self, group, kill)
@@ -304,6 +320,7 @@ class Ball(Sprite):
                         self.vel.x = self.game.player.vel.x - self.initBallSpeed
                     else: #If player isn't moving
                         self.vel.x = self.vel.x * -1
+
                 # print("Player")
                 # print(self.game.player.vel.x)
                 # print(self.game.player.vel.y)
@@ -321,12 +338,48 @@ class Ball(Sprite):
                         self.vel.y = self.game.player.vel.y - self.initBallSpeed
                     else:
                         self.vel.y = self.vel.y * -1
+            #if hitting mob
+            if str(hits[0].__class__.__name__) == "Mob":
+                #If the mob and the ball are facing the same direction
+                if self.vel.x * self.game.mob.vel.x > 0:
+                    #Moves in the opposite direction
+                    self.vel.x = self.vel.x * -1
+                else:
+                    #If the mob hits the ball
+                    if self.game.mob.vel.x > 0:
+                        #Increase speed based on the mob
+                        self.vel.x = self.game.mob.vel.x + self.initBallSpeed
+                    elif self.game.mob.vel.x < 0:
+                        self.vel.x = self.game.mob.vel.x - self.initBallSpeed
+                    else: #If mob isn't moving
+                        self.vel.x = self.vel.x * -1
+            
+                # print("Player")
+                # print(self.game.player.vel.x)
+                # print(self.game.player.vel.y)
+                # print("Ball")
+                # print(self.vel.x)
+                # print(self.vel.y)
+
+                #Same as x
+                if self.vel.y * self.game.mob.vel.y > 0:
+                    self.vel.y = self.vel.y * -1
+                else:
+                    if self.game.mob.vel.y > 0:
+                        self.vel.y = self.game.mob.vel.y + self.initBallSpeed
+                    elif self.game.mob.vel.y < 0:
+                        self.vel.y = self.game.mob.vel.y - self.initBallSpeed
+                    else:
+                        self.vel.y = self.vel.y * -1
                 
 
             # hitting the goal
             if str(hits[0].__class__.__name__) == "Goal":
                 self.count += 1
-                self.kill()
+                self.pos.x = 480
+                self.pos.y = 330
+                self.vel.x = 0
+                self.vel.y = 0
                 
 
     def update(self):
@@ -334,12 +387,12 @@ class Ball(Sprite):
         self.pos.x += self.vel.x
         self.pos.y += self.vel.y
         #Collision with stuff
-        self.rect.x = self.pos.x
         self.collide_with_walls('x')
-        self.rect.y = self.pos.y
+        self.rect.x = self.pos.x
         self.collide_with_walls('y')
+        self.rect.y = self.pos.y
 
-        self.collide_with_stuff(self.game.all_mobs, False)
+        #self.collide_with_stuff(self.game.all_mobs, False)
         self.collide_with_stuff(self.game.all_players, False)
         self.collide_with_stuff(self.game.all_goals, False)
 

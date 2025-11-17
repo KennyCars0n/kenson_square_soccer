@@ -48,7 +48,7 @@ class Game:
                     self.player = Player(self, col, row)
                 elif tile == 'M':
                     #Creating a mob on every tile 'M'
-                    Mob(self, col, row)
+                    self.mob = Mob(self, col, row)
                 elif tile == 'B':
                     self.ball = Ball(self, col, row)
                     #Creating a goal on every tile 'G'
@@ -90,11 +90,9 @@ class Game:
     def draw(self):
         #BG color
         self.screen.fill(WHITE)
-        #Displaying health on the screen 
-        self.draw_text(self.screen, str(self.player.health), 24, BLACK, 100, 100)
-        #Displaying score on the screen
-        self.draw_text(self.screen, str(self.ball.count), 24, BLACK, 400, 100)
-        self.draw_text(self.screen, str(self.time), 24, BLACK, 700, 100 )
+        #Displaying score on the screen 
+        self.draw_text(self.screen, str(self.ball.count), 24, BLACK, 100, 100)
+
         #Adding all of the sprites
         self.all_sprites.draw(self.screen)
         pg.display.flip()
